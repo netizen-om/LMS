@@ -38,6 +38,25 @@ export const createUserAccount = catchAsync(async (req, res) => {
  */
 export const authenticateUser = catchAsync(async (req, res) => {
   // TODO: Implement user authentication functionality
+  const { email, password } = req.body;
+  
+  const user = await User.findOne( { email } ).select("+password")
+  console.log(user);
+  
+  if(!user) {
+    throw new AppError("User does not exist", 400)
+  }
+  
+  let iscorrectPassword = await user.comparePassword(password)
+  console.log(iscorrectPassword);
+  
+  if(!iscorrectPassword) {
+    throw new AppError("Invalid Credentials", 400)
+  }
+
+  await user.updateLastActive()
+  generateToken(res, user._id, `SignIn Successfull`);
+
 });
 
 /**
