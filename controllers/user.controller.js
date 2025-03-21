@@ -86,23 +86,7 @@ export const getCurrentUserProfile = catchAsync(async (req, res) => {
  */
 export const updateUserProfile = catchAsync(async (req, res) => {
   // TODO: Implement update user profile functionality
-  const { name, email, password, role = "student", bio } = req.body;
-
-  const isExistedUser = await User.findOne({ email : email.toLowerCase() })
-  if(isExistedUser) {
-    AppError("User Already Existed", 400);
-  }
-
-  const user = await User.create({
-    name,
-    email : email.toLowerCase(),
-    password,
-    role,
-    bio
-  })
   
-  await user.updateLastActive();
-  generateToken(res, user._id, "Account created successfully")
 });
 
 /**
@@ -111,6 +95,33 @@ export const updateUserProfile = catchAsync(async (req, res) => {
  */
 export const changeUserPassword = catchAsync(async (req, res) => {
   // TODO: Implement change user password functionality
+  const { currentPassword, newPassword } = req.body;
+
+  if(!currentPassword || !newPassword) {
+    throw new AppError("All fields are required", 400)
+  }
+  
+  const user = await User.findById(req.id)
+  
+  if(!(user.comparePassword(currentPassword))){
+    throw new AppError("Incorrect Password", 400)
+  }
+
+  user.password = newPassword
+  await user.save()
+
+  res
+    .status(200)
+    .json(
+      {
+        message : "Password Changed Successfully"
+      },
+      {
+        success : true
+      }
+
+    )
+
 });
 
 /**
