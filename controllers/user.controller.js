@@ -67,7 +67,7 @@ export const signOutUser = catchAsync(async (_, res) => {
   // TODO: Implement sign out functionality
   res
     .status(200)
-    .cookie("token", "")
+    .cookie("token", "", { maxAge: 0 })
     .json({ message : "Signout Successfull" }, { success : true})
 });
 
@@ -148,6 +148,7 @@ export const deleteUserAccount = catchAsync(async (req, res) => {
   // TODO: Implement delete user account functionality
   const user = await User.findByIdAndDelete(req.id)
 
+  res.cookie("token", "", { maxAge: 0 });
   return res
             .status(200)
             .json(
