@@ -65,6 +65,10 @@ export const authenticateUser = catchAsync(async (req, res) => {
  */
 export const signOutUser = catchAsync(async (_, res) => {
   // TODO: Implement sign out functionality
+  res
+    .status(200)
+    .cookie("token", "")
+    .json({ message : "Signout Successfull" }, { success : true})
 });
 
 /**
@@ -73,6 +77,7 @@ export const signOutUser = catchAsync(async (_, res) => {
  */
 export const getCurrentUserProfile = catchAsync(async (req, res) => {
   // TODO: Implement get current user profile functionality
+  
 });
 
 /**
@@ -81,6 +86,23 @@ export const getCurrentUserProfile = catchAsync(async (req, res) => {
  */
 export const updateUserProfile = catchAsync(async (req, res) => {
   // TODO: Implement update user profile functionality
+  const { name, email, password, role = "student", bio } = req.body;
+
+  const isExistedUser = await User.findOne({ email : email.toLowerCase() })
+  if(isExistedUser) {
+    AppError("User Already Existed", 400);
+  }
+
+  const user = await User.create({
+    name,
+    email : email.toLowerCase(),
+    password,
+    role,
+    bio
+  })
+  
+  await user.updateLastActive();
+  generateToken(res, user._id, "Account created successfully")
 });
 
 /**
