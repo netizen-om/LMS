@@ -12,6 +12,24 @@ import crypto from "crypto";
  */
 export const createUserAccount = catchAsync(async (req, res) => {
   // TODO: Implement create user account functionality
+  const { name, email, password, role = "student", bio } = req.body;
+
+  const isExistedUser = await User.findOne({ email : email.toLowerCase() })
+  if(isExistedUser) {
+    AppError("User Already Existed", 400);
+  }
+
+  const user = await User.create({
+    name,
+    email : email.toLowerCase(),
+    password,
+    role,
+    bio
+  })
+  
+  await user.updateLastActive();
+  generateToken(res, user._id, "Account created successfully")
+
 });
 
 /**
