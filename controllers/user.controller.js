@@ -101,7 +101,7 @@ export const changeUserPassword = catchAsync(async (req, res) => {
     throw new AppError("All fields are required", 400)
   }
   
-  const user = await User.findById(req.id)
+  const user = await User.findById(req.id).select("+password")
   
   if(!(user.comparePassword(currentPassword))){
     throw new AppError("Incorrect Password", 400)
