@@ -146,4 +146,17 @@ export const resetPassword = catchAsync(async (req, res) => {
  */
 export const deleteUserAccount = catchAsync(async (req, res) => {
   // TODO: Implement delete user account functionality
+  const user = await User.findByIdAndDelete(req.id)
+
+  return res
+            .status(200)
+            .json(
+              {
+                message : "Account Deleted"
+              },
+              {
+                success : true
+              }
+        
+            )
 });
